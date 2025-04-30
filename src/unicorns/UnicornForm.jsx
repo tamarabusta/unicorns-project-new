@@ -1,87 +1,100 @@
-
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useContext } from 'react';
-import { UnicornContext } from '../context/UnicornContext';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
+import { useState, useEffect } from "react";
+import { useUnicorns } from "../context/UnicornContext";
 
 const UnicornForm = () => {
-  const { createUnicorn } = useContext(UnicornContext);
+  const {
+    createUnicorn,
+    updateUnicorn,
+    unicorns,
+    unicornToEdit,
+    setUnicornToEdit,
+  } = useUnicorns();
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-      color: '',
-      age: ''
-    },
-    validationSchema: Yup.object({
-      name: Yup.string().required('El nombre es obligatorio'),
-      color: Yup.string().required('El color es obligatorio'),
-      age: Yup.number()
-        .required('La edad es obligatoria')
-        .positive('La edad debe ser mayor a 0')
-        .integer('La edad debe ser un número entero')
-    }),
-    onSubmit: (values, { resetForm }) => {
-      createUnicorn(values);
-      resetForm();
-    },
-  });
+  const [nombre, setNombre] = useState("");
+  const [color, setColor] = useState("");
+  const [poder, setPoder] = useState("");
+  const [edad, setEdad] = useState("");
+  const [estado, setEstado] = useState("");
+
+  useEffect(() => {
+    if (unicornToEdit) {
+      setNombre(unicornToEdit.nombre);
+      setColor(unicornToEdit.color);
+      setPoder(unicornToEdit.poder);
+      setEdad(unicornToEdit.edad);
+      setEstado(unicornToEdit.estado || "");
+    }
+  }, [unicornToEdit]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const newUnicorn = { nombre, color, poder, edad, estado };
+
+    if (unicornToEdit) {
+      updateUnicorn(unicornToEdit.id, newUnicorn);
+      setUnicornToEdit(null);
+    } else {
+      createUnicorn(newUnicorn);
+    }
+
+    // Resetear campos
+    setNombre("");
+    setColor("");
+    setPoder("");
+    setEdad("");
+    setEstado("");
+  };
 
   return (
-    <form onSubmit={formik.handleSubmit} className="p-fluid p-formgrid p-grid" style={{ marginBottom: '2rem' }}>
-      <div className="p-field p-col-12 p-md-4">
-        <label>Nombre</label>
-        <InputText
-          id="name"
-          name="name"
-          value={formik.values.name}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Ej: Sparkle"
-          className={formik.touched.name && formik.errors.name ? 'p-invalid' : ''}
-        />
-        {formik.touched.name && formik.errors.name ? (
-          <small className="p-error">{formik.errors.name}</small>
-        ) : null}
-      </div>
+    <form onSubmit={handleSubmit} style={{ padding: "1rem", maxWidth: "500px", margin: "auto" }}>
+      <h3>{unicornToEdit ? "Editar Unicornio" : "Nuevo Unicornio"}</h3>
+      <input
+        type="text"
+        placeholder="Nombre"
+        value={nombre}
+        onChange={(e) => setNombre(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Color"
+        value={color}
+        onChange={(e) => setColor(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Poder"
+        value={poder}
+        onChange={(e) => setPoder(e.target.value)}
+        required
+      />
+      <input
+        type="number"
+        placeholder="Edad"
+        value={edad}
+        onChange={(e) => setEdad(e.target.value)}
+        required
+      />
+      <input
+        type="text"
+        placeholder="Estado (ej: Activo/Inactivo)"
+        value={estado}
+        onChange={(e) => setEstado(e.target.value)}
+      />
 
-      <div className="p-field p-col-12 p-md-4">
-        <label>Color</label>
-        <InputText
-          id="color"
-          name="color"
-          value={formik.values.color}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Ej: Arcoíris"
-          className={formik.touched.color && formik.errors.color ? 'p-invalid' : ''}
-        />
-        {formik.touched.color && formik.errors.color ? (
-          <small className="p-error">{formik.errors.color}</small>
-        ) : null}
-      </div>
-
-      <div className="p-field p-col-12 p-md-4">
-        <label>Edad</label>
-        <InputText
-          id="age"
-          name="age"
-          value={formik.values.age}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          placeholder="Ej: 7"
-          className={formik.touched.age && formik.errors.age ? 'p-invalid' : ''}
-        />
-        {formik.touched.age && formik.errors.age ? (
-          <small className="p-error">{formik.errors.age}</small>
-        ) : null}
-      </div>
-
-      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-        <Button type="submit" label="Crear Unicornio" className="p-button-success" />
-      </div>
+      <button type="submit" style={{
+        marginTop: "1rem",
+        padding: "10px 20px",
+        backgroundColor: "#28a745",
+        color: "white",
+        border: "none",
+        borderRadius: "5px",
+        cursor: "pointer"
+      }}>
+        {unicornToEdit ? "Guardar cambios" : "Crear unicornio"}
+      </button>
     </form>
   );
 };

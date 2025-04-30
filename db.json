@@ -1,0 +1,21 @@
+{
+    "unicorns": [
+      {
+        "id": 1,
+        "nombre": "Sparkle",
+        "color": "Rosa",
+        "poder": "Volar",
+        "edad": 300,
+        "estado": "Activo"
+      },
+      {
+        "id": 2,
+        "nombre": "Shadow",
+        "color": "Negro",
+        "poder": "Invisibilidad",
+        "edad": 150,
+        "estado": "Inactivo"
+      }
+    ]
+  }
+  
